@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict
+from typing import Optional
 
 
 class User(BaseModel):
@@ -6,4 +7,4 @@ class User(BaseModel):
 
     id: int
     tg_id: int
-    notion_token: str
+    notion_token: Optional[str] = None

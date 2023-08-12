@@ -5,26 +5,13 @@ volumes:
   logs:
 
 services:
-  db:
-    image: postgres:14
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - "db:/var/lib/postgresql/data"
-    ports:
-      - "5555:5432"
-
   bot:
     build:
       context: ./src
       dockerfile: Dockerfile
+    command: bash -c "alembic upgrade head && python3.11 -m app"
     restart: always
     env_file:
       - .env
     volumes:
       - "logs:/data"
-    depends_on:
-      - db

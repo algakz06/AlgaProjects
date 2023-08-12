@@ -1,4 +1,3 @@
-from app.core.db import SessionLocal
 
 # region db
 

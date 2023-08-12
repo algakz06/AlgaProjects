@@ -1,25 +1,13 @@
-FROM python:3.11
+# Separate "build" image
+FROM python:3.11-slim-bullseye
 
-ENV PYTHONFAULTHANDLER=1 \
-    PYTHONUNBUFFERED=1 \
-    PYTHONHASHSEED=random \
-    PIP_NO_CACHE_DIR=off \
-    PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_VERSION=1.0.0
 
-RUN pip install "poetry==1.3.2"
+COPY requirements.txt .
 
-# Install dependencies
+RUN pip install --no-cache-dir --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt
 
-COPY poetry.lock pyproject.toml ./
-RUN poetry config virtualenvs.create false \
-    && poetry install --only main --no-interaction --no-ansi
+WORKDIR /app
 
-RUN mkdir logs/
-# Run your app
 COPY . .
 
-CMD ["alembic", "revision", "--autogenerate", "-m", "smth"]
-CMD ["alembic", "upgrade", "head"]
-CMD [ "poetry", "run", "python", "-m", "app" ]

@@ -1,37 +1,40 @@
 # region third-party imports
-from aiogram import Bot
-from aiogram.dispatcher import Dispatcher
+from aiogram import Bot, Dispatcher, Router
 import asyncio
 
 # endregion
 
 # region local imports
 from app.config import settings
-from app.handlers.start import start as start_handler
+from app.handlers.start import router as start_router
+from app.middlewares.db_middleware import DbSessionMiddleware
 from app.core.db import init_db
 
 
 # endregion
-def setup_handlers(dp: Dispatcher):
+def setup_handlers(router: Router):
     """
     Setup all handlers
     """
-    dp.register_message_handler(start_handler, commands=["start"])
+    router.register_message_handler(start_handler, commands=["start"])
 
 
 async def main():
     """Initialize bot and dispatcher"""
     bot = Bot(token=settings.TG_TOKEN, parse_mode="HTML")
-    dp = Dispatcher(bot)
+    dp = Dispatcher()
 
     """Initialize database"""
-    init_db()
+    session = init_db()
+
+    """Setup middlewares"""
 
     """Setup handlers"""
-    setup_handlers(dp)
+    start_router.message.middleware(DbSessionMiddleware(session))
+    dp.include_router(start_router)
 
     """Start polling"""
-    await dp.start_polling()
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
