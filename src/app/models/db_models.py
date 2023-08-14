@@ -18,6 +18,6 @@ class Databases(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    name = Column(String, nullable=False)
-    notion_id = Column(String, nullable=False, unique=True)
+    db_name = Column(String, nullable=False)
+    db_id = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime, nullable=False, default="now()")
