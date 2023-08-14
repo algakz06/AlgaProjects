@@ -1,5 +1,7 @@
 import requests
 
+from app.config import log
+
 notion_url = "https://api.notion.com/v1/databases/"
 
 
@@ -19,6 +21,27 @@ class Notion:
         headers["Authorization"] = "Bearer " + access_token
 
         return headers
+
+    def check_token(self, access_token: str) -> bool:
+        """
+        using method get all users for checking is token valid
+        """
+        url = self.base_url + "/users"
+        headers = self._build_headers(access_token)
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code in [200, 403]:
+            """
+            200 - token is valid
+            we use 403 status code, cause it shows that token is valid,\
+            but user didnt promote access to this method
+            """
+            return True
+        else:
+            log.info(f"Token {access_token} is not valid")
+            log.debug(f"Response: {response.json()}")
+            return False
 
     def add_page_to_db(self, db_id: str, access_token: str, page_name: str):
         """
